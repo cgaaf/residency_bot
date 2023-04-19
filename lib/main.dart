@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:residency_bot/models/message.dart';
 import 'package:residency_bot/widgets/chat_box.dart';
 import 'package:residency_bot/widgets/chat_input.dart';
 
@@ -13,11 +14,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Chatbot Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Chatbot Demo'),
     );
   }
 }
@@ -31,15 +32,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<String> _sampleData = [
-    "Message 1 This is definately a hi",
-    "Message 2",
-    "Message 3"
-  ];
+  final List<Message> _sampleData = Message.sampleMessages;
 
   void submitText(String string) {
     setState(() {
-      _sampleData.add(string);
+      Message message = Message(ChatRole.user, string);
+      _sampleData.add(message);
     });
   }
 

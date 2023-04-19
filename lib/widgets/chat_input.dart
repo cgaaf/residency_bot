@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
 
 class ChatInput extends StatelessWidget {
-  const ChatInput({super.key, required this.onSubmitted});
+  ChatInput({super.key, required this.onSubmitted});
 
   final void Function(String) onSubmitted;
 
-  void pressButton() {}
+  void pressButton() {
+    onSubmitHandler(controller.text);
+  }
+
+  void onSubmitHandler(String inputText) {
+    onSubmitted(inputText);
+    controller.clear();
+    print("Input cleared");
+  }
+
+  var controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -13,6 +23,7 @@ class ChatInput extends StatelessWidget {
       children: [
         Expanded(
           child: TextField(
+            controller: controller,
             decoration: InputDecoration(
               border: const OutlineInputBorder(),
               hintText: "Ask your question",
@@ -21,7 +32,7 @@ class ChatInput extends StatelessWidget {
                 icon: const Icon(Icons.arrow_forward_rounded),
               ),
             ),
-            onSubmitted: onSubmitted,
+            onSubmitted: onSubmitHandler,
           ),
         ),
       ],
