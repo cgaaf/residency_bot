@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:residency_bot/models/message.dart';
+import 'package:residency_bot/services/chatgpt_client.dart';
 import 'package:residency_bot/widgets/chat_box.dart';
 import 'package:residency_bot/widgets/chat_input.dart';
 
@@ -38,6 +39,15 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       Message message = Message(ChatRole.user, string);
       _sampleData.add(message);
+    });
+
+    final client = ChatGPTClient();
+    // client.sendMessage();
+    var messageCount = 0;
+    client.sendMessageStream().listen((event) {
+      messageCount += 1;
+      print("Message $messageCount");
+      print(event);
     });
   }
 
