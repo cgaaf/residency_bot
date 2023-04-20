@@ -37,17 +37,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void submitText(String string) {
     setState(() {
-      Message message = Message(ChatRole.user, string);
-      _sampleData.add(message);
-    });
+      Message userMessage = Message(ChatRole.user, string);
+      _sampleData.add(userMessage);
 
-    final client = ChatGPTClient();
-    // client.sendMessage();
-    var messageCount = 0;
-    client.sendMessageStream().listen((event) {
-      messageCount += 1;
-      print("Message $messageCount");
-      print(event);
+      Message assistantMessage = Message(ChatRole.assistant, "");
+      _sampleData.add(assistantMessage);
+
+      final client = ChatGPTClient();
+      client.sendMessageStream().listen((responseChunk) {
+        setState(() {
+          _sampleData.last.content += responseChunk;
+        });
+      });
     });
   }
 

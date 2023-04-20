@@ -3,7 +3,7 @@ import '../widgets/chat_message.dart';
 class Message {
   Message(this.role, this.content);
   final ChatRole role;
-  final String content;
+  String content;
 
   static List<Message> sampleMessages = [
     Message(ChatRole.user, "Hello what do you do?"),
