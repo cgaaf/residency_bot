@@ -28,7 +28,7 @@ class ChatMessage extends StatelessWidget {
           style: Theme.of(context).textTheme.labelSmall,
         ),
         Text(
-          message.content,
+          message.content ?? "Error",
           style: Theme.of(context).textTheme.bodyMedium,
         ),
       ],

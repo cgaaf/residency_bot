@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:residency_bot/models/message.dart';
 import 'package:residency_bot/services/chat_websocket.dart';
-import 'package:residency_bot/services/chatgpt_client.dart';
 import 'package:residency_bot/widgets/chat_box.dart';
 import 'package:residency_bot/widgets/chat_input.dart';
+import 'package:uuid/uuid.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,15 +34,39 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final List<Message> _sampleData = Message.sampleMessages;
+  final List<Message> _messages = [];
   final chatSocket = GPTWebSocket();
 
   @override
   void initState() {
-    chatSocket.channel.stream.listen((event) {
-      print(event);
+    // chatSocket.channel.stream.listen((event) {
+    //   print(event);
+    //   setState(() {
+    //     _messages
+    //   });
+    // });
+
+    // chatSocket.getMessageStream().listen((event) {
+    //   print(event);
+    // });
+    print("GETTING MESSAGE STREAM");
+    final messageStream = chatSocket.getMessageStream();
+    print("MESSAGE STREAM RECEIVED");
+    messageStream.listen((streamedMessage) {
+      final localMessageExists =
+          _messages.map((e) => e.id).contains(streamedMessage.id);
+      print(streamedMessage);
+
       setState(() {
-        _sampleData.last.content += event;
+        if (localMessageExists) {
+          // find local message and add the new content
+          var localMessage = _messages
+              .firstWhere((element) => element.id == streamedMessage.id);
+          localMessage.content += streamedMessage.content;
+        } else {
+          // add the first streamed message to the list
+          _messages.add(streamedMessage);
+        }
       });
     });
 
@@ -51,13 +75,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void submitText(String string) {
     setState(() {
-      Message userMessage = Message(ChatRole.user, string);
-      _sampleData.add(userMessage);
+      // Message userMessage = Message(UChatRole.user, string);
+      final userMessage =
+          Message(const Uuid().v4().toString(), ChatRole.user, string);
+      _messages.add(userMessage);
 
-      Message assistantMessage = Message(ChatRole.assistant, "");
-      _sampleData.add(assistantMessage);
-
-      chatSocket.sendMessage(string);
+      chatSocket.sendMessages(_messages);
     });
   }
 
@@ -73,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              ChatBox(messages: _sampleData),
+              ChatBox(messages: _messages),
               ChatInput(
                 onSubmitted: submitText,
               )
