@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:residency_bot/models/message.dart';
+import 'package:residency_bot/services/chat_websocket.dart';
 import 'package:residency_bot/services/chatgpt_client.dart';
 import 'package:residency_bot/widgets/chat_box.dart';
 import 'package:residency_bot/widgets/chat_input.dart';
@@ -34,6 +35,19 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final List<Message> _sampleData = Message.sampleMessages;
+  final chatSocket = GPTWebSocket();
+
+  @override
+  void initState() {
+    chatSocket.channel.stream.listen((event) {
+      print(event);
+      setState(() {
+        _sampleData.last.content += event;
+      });
+    });
+
+    super.initState();
+  }
 
   void submitText(String string) {
     setState(() {
@@ -43,12 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
       Message assistantMessage = Message(ChatRole.assistant, "");
       _sampleData.add(assistantMessage);
 
-      final client = ChatGPTClient();
-      client.sendMessageStream().listen((responseChunk) {
-        setState(() {
-          _sampleData.last.content += responseChunk;
-        });
-      });
+      chatSocket.sendMessage(string);
     });
   }
 

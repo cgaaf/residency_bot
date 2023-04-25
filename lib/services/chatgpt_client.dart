@@ -1,11 +1,15 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:residency_bot/secret.dart';
 
 import 'stream_client_web.dart';
 import 'package:http/http.dart' as http;
 
 class ChatGPTClient {
-  final uri = Uri.https("api.openai.com", "/v1/chat/completions");
+  // final uri = Uri.https("api.openai.com", "/v1/chat/completions");
+  final uri = Uri.http('localhost:3000', '');
+  // final uri = Uri.https('cgaaf-proxy-erver.deno.dev', '');
+  // final uri = Uri.http('localhost:8000', '');
 
   final _headers = {
     "Content-Type": "application/json",
@@ -29,18 +33,36 @@ class ChatGPTClient {
       "stream": stream,
     };
 
+    print(body);
+
     return jsonEncode(body);
+  }
+
+  Future<void> testHello() async {
+    final uri = Uri.http('localhost:3000', '');
+    final client = http.Client();
+    final response = await client.get(uri);
+    print(response.body);
+    print(response.toString());
   }
 
   Future<String> sendMessage() async {
     final client = http.Client();
+    print("CLIENT");
+    print(client);
     final response = await client.post(uri,
         headers: _headers, body: _getBody(stream: false));
+
+    print("RESPONSE");
+    print(response);
 
     dynamic decodedResponse;
     if (response.contentLength != null) {
       decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
     }
+
+    print("DECODED RESPONSE");
+    print(decodedResponse);
 
     final statusCode = response.statusCode;
     if (!(statusCode >= 200 && statusCode < 300)) {
@@ -64,9 +86,17 @@ class ChatGPTClient {
     request.headers.addAll(_headers);
     request.body = _getBody(stream: true);
 
+    print("SENDING REQUEST");
+    print(request);
+    print(request.body);
+    print(request.headers);
+    print(request.method);
     final response = await StreamClient().send(request);
+    print("RECEIVED RESPONSE");
+    print(response);
     final statusCode = response.statusCode;
     final byteStream = response.stream;
+    print(statusCode);
 
     if (!(statusCode >= 200 && statusCode < 300)) {
       var error = "";
