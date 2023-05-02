@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:residency_bot/models/message.dart';
 
+const url = 'ws://127.0.0.1:8080/chatSocket';
+
 class GPTWebSocket {
   final channel = WebSocketChannel.connect(
-    Uri.parse('ws://127.0.0.1:8080/openAI'),
+    Uri.parse(url),
   );
 
   void sendMessage(String message) {
